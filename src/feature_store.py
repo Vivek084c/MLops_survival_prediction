@@ -6,7 +6,7 @@ class RedisFeatureStore:
             host = host,
             port = port,
             db = db,
-            decode_response = True
+            decode_responses = True
         )
     
     def store_features(self, entity_id, features):
@@ -20,7 +20,7 @@ class RedisFeatureStore:
         '''
         getting the rows one by one
         '''
-        key = f"entity{entity_id}:features"
+        key = f"entity:{entity_id}:features"
         features = self.client.get(key)
         if features:
             return json.loads(features)
@@ -47,4 +47,4 @@ class RedisFeatureStore:
         entity_ids = [key.split(':')[1] for key in keys]
         return entity_ids
 
-    
+
