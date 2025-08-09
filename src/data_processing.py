@@ -99,6 +99,7 @@ class DataProcessing:
                     "Title": row["Title"],
                     "Pclass_Fare": row["Pclass_Fare"],
                     "Age_Fare": row["Age_Fare"],
+                    "Survived": row["Survived"],  # <-- Add this line
                 }
                 batch_data[entity_id] = features
             self.feature_store.store_batch_features(batch_data)
