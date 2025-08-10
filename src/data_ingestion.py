@@ -10,7 +10,6 @@ from src.custom_exception import CustomException
 from config.database_config import DB_CONFIG
 from config.paths_config import RAW_DIR, TRAIN_PATH, TEST_PATH
 
-
 logger = get_logger(__name__)
 
 class DataIngestion:

@@ -125,13 +125,12 @@ class DataProcessing:
             logger.info(f"Errror while data processing pipeline {e}")
             raise CustomException(str(e), sys)
 if __name__ == "__main__":
-    feature_store = RedisFeatureStore(
-
-    )
+    feature_store = RedisFeatureStore()
+    
     data_processor = DataProcessing(
                         train_data_path= TRAIN_PATH ,
                         test_data_path= TEST_PATH,
-                        feature_store=feature_store )
+                        feature_store=feature_store)
 
     data_processor.run()
 
