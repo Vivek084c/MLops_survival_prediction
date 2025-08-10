@@ -57,6 +57,7 @@ class ModelTraining:
             logger.info(train_df)
 
             x_train = train_df.drop("Survived", axis=1)
+            logger.info(x_train.columns)
             x_test = test_df.drop("Survived", axis=1)
             y_train = train_df["Survived"]
             y_test = test_df["Survived"]
