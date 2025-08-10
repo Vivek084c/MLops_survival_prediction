@@ -4,6 +4,9 @@ import pandas as pd
 from flask import Flask, render_template, request, jsonify
 
 from config.paths_config import MODEL_PATH
+from alibi_detect.cd import KSDrift
+from src.feature_store import RedisFeatureStore
+from sklearn.preprocessing import StandardScaler
 
 app = Flask(__name__, template_folder="templates")
 
@@ -12,6 +15,22 @@ with open(MODEL_PATH, "rb") as model_file:
 
 FEATURE_NAMES = ['Age', 'Fare', 'Pclass', 'Sex', 'Embarked', 'Familysize', 'Isalone',
     'HasCabin', 'Title', 'Pclass_Fare', 'Age_Fare']
+
+feature_store = RedisFeatureStore()
+scaler = StandardScaler()
+
+def fit_scaler_on_referance_data():
+    ids = feature_store.get_all_entity_ids()
+    all_features = feature_store.get_batch_features(ids)
+
+    data_df = pd.DataFrame.from_dict(all_features, orient='index')[FEATURE_NAMES]
+
+    scaler.fit(data_df)
+    return scaler.transform(all_features)
+
+historical_data = fit_scaler_on_referance_data()
+ksd = KSDrift(x_ref=historical_data)
+
 
 @app.route('/')
 def home():
