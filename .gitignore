@@ -1,3 +1,16 @@
+.git
+.env
+.DS_Store
+airflow_settings.yaml
+__pychche__/
+astro
+airflow-webserver.pid
+webserver_config.py
+airflow.db
 venv
 MLops_survival_prediction.egg-info
-include/gcp_key.json
+logs/
+tests/
+plugins/
+include/
+.astro/
