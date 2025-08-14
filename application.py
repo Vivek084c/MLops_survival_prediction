@@ -3,6 +3,8 @@ import numpy as np
 import pandas as pd
 from flask import Flask, render_template, request, jsonify
 
+from prometheus_client import start_http_server, Counter, Gauge
+
 from config.paths_config import MODEL_PATH
 from alibi_detect.cd import KSDrift
 from src.feature_store import RedisFeatureStore
@@ -12,6 +14,9 @@ from src.logger import get_logger
 logger = get_logger(__name__)
 
 app = Flask(__name__, template_folder="templates")
+
+prediction_count = Counter('prediction_count', "Number of prediction counte")
+drift_count = Counter('drift_counter',"Number of times the drift is detected")
 
 with open(MODEL_PATH, "rb") as model_file:
     model = pickle.load(model_file)
@@ -67,18 +72,30 @@ def predict():
         drift_response = drift.get('data', {})
         is_drift = drift_response.get('is_drift', None)
         if is_drift is not None and is_drift==1:
+            drift_count.inc()
             print("drift detected...")
             logger.info(f"Data drift is found")
 
 
         prediction = model.predict(features)[0]
+        prediction_count.inc()
 
         result = "Survived" if predict==1 else "Did not Survived"
         return render_template('index.html', prediction_text = f"The predictions is : {result}")
     except Exception as e:
         return jsonify({'error':str(e)})
+    
+@app.route('/mertics')
+def metrics():
+    from prometheus_client import generate_latest
+    from flask import Response
+
+    return Response(generate_latest(), content_type='text/plain')
+
 if __name__ == "__main__":
-    app.run(debug=True)
+    # runing the promethus server
+    start_http_server(8000)
+    app.run(debug=True, host='0.0.0.0', port=5010)
 
 
 
