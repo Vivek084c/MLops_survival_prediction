@@ -89,18 +89,19 @@ class DataProcessing:
             for idx, row in self.data.iterrows():
                 entity_id = row["PassengerId"]
                 features = {
-                    "Age": row['Age'],
-                    "Fare": row["Fare"],
-                    "Pclass": row["Pclass"],
-                    "Sex": row["Sex"],
-                    "Embarked": row["Embarked"],
-                    "Familysize": row["Familysize"],
-                    "HasCabin": row["HasCabin"],
-                    "Title": row["Title"],
-                    "Pclass_Fare": row["Pclass_Fare"],
-                    "Age_Fare": row["Age_Fare"],
-                    "Survived": row["Survived"],  # <-- Add this line
-                }
+                "Age": row['Age'],
+                "Fare": row["Fare"],
+                "Pclass": row["Pclass"],
+                "Sex": row["Sex"],
+                "Embarked": row["Embarked"],
+                "Familysize": row["Familysize"],
+                "Isalone": row["Isalone"],           # <-- Add this line
+                "HasCabin": row["HasCabin"],
+                "Title": row["Title"],
+                "Pclass_Fare": row["Pclass_Fare"],
+                "Age_Fare": row["Age_Fare"],
+                "Survived": row["Survived"],
+            }
                 batch_data[entity_id] = features
             self.feature_store.store_batch_features(batch_data)
             logger.info("Data has been feature into feature Store..")

@@ -7,6 +7,9 @@ from config.paths_config import MODEL_PATH
 from alibi_detect.cd import KSDrift
 from src.feature_store import RedisFeatureStore
 from sklearn.preprocessing import StandardScaler
+from src.logger import get_logger
+
+logger = get_logger(__name__)
 
 app = Flask(__name__, template_folder="templates")
 
@@ -26,7 +29,7 @@ def fit_scaler_on_referance_data():
     data_df = pd.DataFrame.from_dict(all_features, orient='index')[FEATURE_NAMES]
 
     scaler.fit(data_df)
-    return scaler.transform(all_features)
+    return scaler.transform(data_df)  # <-- Use data_df, not all_features
 
 historical_data = fit_scaler_on_referance_data()
 ksd = KSDrift(x_ref=historical_data)
@@ -52,7 +55,21 @@ def predict():
         Pclass_Fare = float(data["Pclass_Fare"])
         Age_Fare = float(data["Age_Fare"])
 
-        features = pd.DataFrame([[Age, Fare, Pclass, Sex, Embarked, Familysize,HasCabin, Title, Pclass_Fare, Age_Fare]])
+        features = pd.DataFrame([[Age, Fare, Pclass, Sex, Embarked, Familysize,Isalone , HasCabin, Title, Pclass_Fare, Age_Fare]])
+
+        ### data drift predictions
+        feature_salced = scaler.transform(features)        
+
+
+        drift = ksd.predict(feature_salced)
+        print("Drift Response : ", drift)
+
+        drift_response = drift.get('data', {})
+        is_drift = drift_response.get('is_drift', None)
+        if is_drift is not None and is_drift==1:
+            print("drift detected...")
+            logger.info(f"Data drift is found")
+
 
         prediction = model.predict(features)[0]
 
